@@ -2,6 +2,7 @@ project:
   type: website
   resources:
     - "Owen_Horton_Resume_2026.pdf"
+    - "44X36_template.pdf"
   output-dir: docs
 
 website:
