@@ -1,16 +1,16 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Owen Horton",
-    "section": "",
-    "text": "Welcome! I’m Owen Horton, an aspiring data consultant pursuing a degree in Mathematics and Data Science with a minor in Geoscience at Lawrence University. I am a rising senior looking to secure a position in a company that will bring meaning to my career. Whether I utilize machine learning methods for marketing strategies within a large business, probabilistic analysis in customer assistance for a financial institution, or data-scientific journals to promote environmental conservation, I’m excited to contribute my skills with a team and help change the world. My professional links and sources are below, but there is much more I have to share about myself. I would be honored if you checked out my other pages of past projects, research, and hobbies!"
-  },
-  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
     "text": "About this site"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Owen Horton",
+    "section": "",
+    "text": "Welcome! I’m Owen Horton, an aspiring data consultant pursuing a degree in Mathematics and Data Science with a minor in Geoscience at Lawrence University. I am a rising senior looking to secure a position in a company that will bring meaning to my career. Whether I utilize machine learning methods for marketing strategies within a large business, probabilistic analysis in customer assistance for a financial institution, or data-scientific journals to promote environmental conservation, I’m excited to contribute my skills with a team and help change the world. My professional links and sources are below, but there is much more I have to share! I would be honored if you checked out my other pages of past projects, research, and hobbies!"
   }
 ]
