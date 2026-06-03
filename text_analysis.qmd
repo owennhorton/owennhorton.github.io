@@ -2,4 +2,350 @@
 title: "Text Analysis Project"
 ---
 
-(Nothing to see here yet :) )
+This project focuses on the text analysis of similar movie datasets, and what we can conclude about how average sentiment of movie critics have evolved over time in response to new movies. The below code chunks will not be run due to the datasets being too large to sufficiently parse with the website's available memory. Instead, the resulting blog post PDF can be accessed [here](Text_Analysis_Project.pdf).
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+
+# Install necessary packages
+# install.packages("ggridges")
+# install.packages("geomtextpath")
+
+# Load necessary packages
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(tidytext)
+library(textdata)
+library(dslabs)
+library(geomtextpath)
+library(ggridges)
+library(stringr)
+
+```
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+
+# Data Collection
+
+
+# Movie Reviews Dataset with info on movies and critics from Rotten Tomatoes
+# (https://www.kaggle.com/datasets/stefanoleone992/rotten-tomatoes-movies-and-critic-reviews-dataset?select=rotten_tomatoes_critic_reviews.csv)
+
+rt_movies <- read.csv("rotten_tomatoes_movies.csv")
+
+rt_critics <- read.csv("rotten_tomatoes_critic_reviews.csv")
+
+```
+
+
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+
+# Data Wrangling - Zoe's Work
+
+# Join rt_movies and rt_critics
+# I am going ot join on movie title so each critic review 
+# inherits movie-level metadata
+# (genre, audience, score, etc)
+rt_joined <- rt_critics |>
+  inner_join(rt_movies, by = "rotten_tomatoes_link") |>
+  select(
+    rotten_tomatoes_link,
+    movie_title,
+    genres,
+    critic_name,
+    review_content,
+    review_score,
+    tomatometer_rating,
+    audience_rating
+  ) |>
+  
+  # Drop rows missing review text or genre
+  filter(!is.na(review_content), !is.na(genres))
+
+# Regex extract primary genre (first genre listed)
+# genres column looks like "Drama, Romance, Comedy) - I want just the first. 
+rt_joined <- rt_joined |>
+  mutate(
+    primary_genre = str_extract(genres, "^[A-Za-z\\s&]+") |>
+      str_trim()
+  )
+
+# Keep only the most common genres for readability in the viz
+top_genres <- rt_joined |> 
+  count(primary_genre, sort = TRUE) |>
+  slice_head(n = 7) |>
+  pull(primary_genre)
+
+# Filter to top genres
+rt_genre <- rt_joined |>
+  filter(primary_genre %in% top_genres)
+
+```
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+
+# Data Wrangling - Owen's Work
+
+# Start by joining rt_critics and rt_movies
+RT_joined <- rt_critics |>
+  inner_join(rt_movies, by = "rotten_tomatoes_link") |>
+  select(
+    rotten_tomatoes_link,
+    movie_title,
+    genres,
+    critic_name,
+    review_content,
+    content_rating,
+    original_release_date,
+    review_score,
+    tomatometer_rating,
+    audience_rating
+  )
+
+# Renaming to neat column names and cleanup that will make the data less noisy
+reviews_data <- RT_joined |>
+  rename(review = review_content) |> 
+  rename(rating = content_rating) |> 
+  rename(date = original_release_date) |> 
+  rename(title = movie_title) |> 
+  mutate(date = as.Date(date)) |>
+  filter(date >= 1980-1-1) |> # Filtering out years before 1980 for simplicity
+  filter(rating == "G" | rating == "PG" | rating == "PG-13" | rating == "R") |>
+  # Filtering the most common movie ratings in the dataset for simplicity
+  select(title, date, rating, review)
+
+```
+
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+
+# Text Analysis - Zoe's Work
+
+# Tokenize review text
+# One row per word per review
+rt_tokens <- rt_genre |> 
+  select(rotten_tomatoes_link, primary_genre, review_content) |>
+  unnest_tokens(word,review_content) |>
+  # Remove stop words
+  anti_join(stop_words, by = "word")
+
+# Sentiment analysis using AFINN ( numeric scores -5 to +5)
+# This lets us plot a distribution of sentiment rather than just a mean
+rt_sentiment <- rt_tokens |>
+  inner_join(get_sentiments("afinn"), by = "word") |>
+  group_by(rotten_tomatoes_link, primary_genre) |>
+  summarise(
+    mean_sentiment = mean(value),
+    .groups = "drop"
+  )
+
+# TF-IDF, finds words most characteristic of each genre's reviews
+rt_tfidf <- rt_tokens |>
+  count(primary_genre, word, sort = TRUE) |>
+  bind_tf_idf(word, primary_genre, n) |>
+  group_by(primary_genre) |>
+  slice_max(tf_idf, n = 5) |>
+  ungroup()
+
+# Print top TF-IDF words per genre
+
+rt_tfidf |>
+  select(primary_genre, word, tf_idf) |>
+  print(n = 40)
+
+genre_order <- rt_sentiment |>
+  group_by(primary_genre) |>
+  summarise(med = median(mean_sentiment)) |>
+  arrange(med) |>
+  pull(primary_genre)
+
+rt_sentiment <- rt_sentiment |>
+  mutate(primary_genre = factor(primary_genre, levels = genre_order))
+
+
+```
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+ 
+ # Text Analysis - Owen's Work
+
+data(stop_words)
+
+# Tokenization of title words for future removal from critic reviews
+title_words <- reviews_data |> 
+  dplyr::select(title) |> 
+  tidytext::unnest_tokens(word, title)
+
+# Tokenization of reviews and removal of stop words, digits, and 
+# movie title words
+reviews_words <- reviews_data |> 
+  tidytext::unnest_tokens(output = word, input = review) |> 
+  anti_join(stop_words, by = "word") |> 
+  anti_join(title_words, by = "word") |>
+  filter(!str_detect(word, "\\d"))
+
+# Count words
+word_counts <- reviews_words |> 
+  count(title, word, rating, date)
+
+# TF-IDF 
+# (Got ChatGPT's help with finding the right function to create 
+# TF and IDF columns)
+word_tfidf <- word_counts |> 
+  bind_tf_idf(word, title, n)
+
+# Keep top words per movie
+filtered_words <- word_tfidf |> 
+  group_by(title) |> 
+  slice_max(tf_idf, n = 50)
+  # Filtering out words that don't carry as much importance (Only top 50)
+
+# Upload AFINN, the package that applies values to sentiments
+afinn <- tidytext::get_sentiments("afinn")
+
+# Sentiment analysis
+reviews_sentiments <- filtered_words |> 
+  left_join(afinn, by = "word") |> 
+  filter(!is.na(value))
+
+# Dataset containing the average sentiment of each movie
+sentiment_by_movie <- reviews_sentiments |> 
+  group_by(title, date, rating) |> 
+  summarize(avg_sentiment = mean(value), .groups = "drop")
+
+# Final dataset containing the average sentiment for each year
+# (Cleaner when I present the data viz)
+final_dataset <- sentiment_by_movie |>
+  mutate(year = lubridate::year(date)) |>
+  group_by(year, rating) |>
+  summarize(avg_sentiment = mean(avg_sentiment), .groups = "drop")
+
+# Final dataset check
+show(final_dataset)
+
+```
+
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+
+# Data Viz - Zoe's Work
+
+ggplot(rt_sentiment, aes(x = mean_sentiment, y = primary_genre, fill = after_stat(x))) +
+  geom_density_ridges_gradient(
+    scale = 2.5,
+    rel_min_height = 0.01,
+    quantile_lines = TRUE,
+    quantiles = 2
+  ) +
+  scale_fill_gradient2(
+    low = "#b2182b",
+    mid = "#f7f7f7",
+    high = "#2166ac",
+    midpoint = 0,
+    name = "Sentiment\nScore"
+  ) + 
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray40", linewidth = 0.5) +
+  labs(
+    title = "How Positive Is the Language Critics Use by Genre?",
+    subtitle = " Distribution of mean AFINN sentiment scores in Rotten Tomatoes critic reviews",
+    x = "Mean Sentiment Score (AFINN, per review)",
+    y = "Primary Genre",
+    caption = "Source: Rotten Tomatoes dataset(Kaggle), Vertical dashed line = neutral sentiment."
+  ) + 
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14), 
+    plot.subtitle = element_text(color = "gray40", size = 10),
+    legend.position = "right", 
+    panel.grid.minor = element_blank()
+  )
+
+```
+
+
+```{r}
+#| echo: true
+#| eval: false
+#| error: true
+
+# Data Viz - Owen's Work
+
+ggplot(final_dataset, aes(x = year, y = avg_sentiment, color = rating)) +
+  
+  # Line Plot
+  geom_line(linewidth = 1.2, alpha = 0.3) +
+  
+  # Smooth Curves
+  geom_textsmooth(
+    aes(label = rating),
+    text_smoothing = 30,
+    method = "loess",
+    formula = y ~ x,
+    se = FALSE,
+    size = 4,
+    linewidth = 1
+  ) +
+  theme_bw() +
+  
+  # Labels
+  labs(
+    title = "How do Average Sentiments by Rating change over Time?",
+    x = "Year Released",
+    y = "Average Sentiment"
+  ) +
+  
+  # Decorative theme elements (with help of ChatGPT)
+  theme(
+    plot.background = element_rect(fill = "moccasin", color = NA),
+    
+    panel.border = element_rect(color = "black", linewidth = 1.5),
+    
+    plot.title = element_text(
+      face = "bold",
+      size = 14,
+      hjust = 0.5
+    ),
+    
+    axis.title = element_text(face = "bold"),
+    
+    axis.text = element_text(
+      color = "black",
+      size = 10
+    ),
+    
+    plot.margin = margin(9,9,9,9),
+    
+    legend.position = "none",
+    
+    strip.text = element_text(face = "bold")
+  )
+
+```
+
