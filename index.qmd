@@ -1,11 +1,24 @@
 ---
-title: "project"
+title: "Owen Horton"
+image: owen_picture.jpeg
+toc: false
+about: 
+  template: jolla
+  image-shape: round
+  image-width: 17em
+  links:
+    - text: Resume
+      icon: file-earmark-pdf
+      href: Owen_Horton_Resume 2026.pdf
+      target: _blank
+    - text: LinkedIn
+      href: https://www.linkedin.com/in/owen-horton-lu11353/
+      target: _blank
+    - text: GitHub
+      href: https://github.com/owennhorton
+      target: _blank 
+    - text: Email
+      href: mailto:owen.n.horton@lawrence.edu
 ---
 
-This is a Quarto website.
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
-
-```{html}
-<iframe src="https://owennhorton.github.io/" width="100%" height="600px"></iframe>
-```
+Welcome! I'm Owen Horton, an aspiring data consultant pursuing a degree in Mathematics and Data Science with a minor in Geoscience at Lawrence University. I am a rising senior looking to secure a position in a company that will bring meaning to my career. Whether I utilize machine learning methods for marketing strategies within a large business, probabilistic analysis in customer assistance for a financial institution, or data-scientific journals to promote environmental conservation, I'm excited to contribute my skills with a team and help change the world. My professional links and sources are below, but there is much more I have to share about myself. I would be honored if you checked out my other pages of past projects, research, and hobbies! 
