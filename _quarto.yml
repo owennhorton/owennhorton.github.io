@@ -1,9 +1,11 @@
 project:
   type: website
+  resources:
+    - Owen_Horton_Resume_2026.pdf
   output-dir: docs
 
 website:
-  title: "project"
+  title: "Owen Horton"
   navbar:
     left:
       - href: index.qmd
@@ -17,6 +19,7 @@ format:
       - brand
     css: styles.css
     toc: true
+    page-layout: full
 
 
 
