@@ -64,7 +64,7 @@ log_out(y = toy_data$y2, x = toy_data$x1, deg = 1, positive = "TRUE")
 
 Description: lin_out and log_out are preliminary functions that obtain vertical distances and give the data scientist insight, but kick_out gets the rest of the job done. It isolates data points based on a threshold you set for the vertical distance, and will filter out the respective rows in your raw dataset to make a clean, outlier-free data frame. Be careful however, the dataset you put in kick_out must not have any missing entries, or an error will be thrown.
 
-If you want, reportr can help eliminate those pesky outliers from your data. Add the dataset you used as a dataframe, along with the distances obtained from lin_out or log_out, and a threshold for what distances will be considered outliers to be eliminated. The result will be your dataset with all the isolated outliers filtered out (Note that the row numbers on this output can be misleading, there are actually only 13 rows here). 
+Usage: If you want, reportr can help eliminate those pesky outliers from your data. Add the dataset you used as a dataframe, along with the distances obtained from lin_out or log_out, and a threshold for what distances will be considered outliers to be eliminated. The result will be your dataset with all the isolated outliers filtered out (Note that the row numbers on this output can be misleading, there are actually only 13 rows here). 
 
 ```{r}
 output <- log_out(y = toy_data$y2, x = toy_data$x1, deg = 1, positive = "TRUE")
