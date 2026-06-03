@@ -2,4 +2,5 @@
 title: "Shiny Paper Poster"
 ---
 
-(Nothing to see here yet :) )
+In this project, I collaborated with Zoe Doherty to create a poster summarizing the claims, methodologies, and conclusions established by a review paper of Shiny, titled ["Six Years of Shiny in Research - Collaborative Development of Web Tools in R"](https://journal.r-project.org/articles/RJ-2021-004/). Our poster can be found [here](Project_Poster.pdf).
+

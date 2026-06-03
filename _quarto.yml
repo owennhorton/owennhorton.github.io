@@ -3,6 +3,7 @@ project:
   resources:
     - "Owen_Horton_Resume_2026.pdf"
     - "44X36_template.pdf"
+    - "Project_Poster.pdf"
   output-dir: docs
 
 website:
