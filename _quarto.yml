@@ -1,7 +1,7 @@
 project:
   type: website
   resources:
-    - Owen_Horton_Resume_2026.pdf
+    - "Owen_Horton_Resume_2026.pdf"
   output-dir: docs
 
 website:
