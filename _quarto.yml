@@ -13,6 +13,19 @@ website:
         text: Home
       - href: about.qmd
         text: Research
+        menu:
+          - href: sql.qmd
+            text: SQL Project
+          - href: text_analysis.qmd
+            text: Text Analysis Project
+          - href: terra.qmd
+            text: terra Package Presentation
+          - href: reportr.qmd
+            text: reportr Package
+          - href: poster.qmd
+            text: Shiny Paper Poster
+      - href: secret_hobbies.qmd
+        text: Secret Hobbies
 
 format:
   html:
